@@ -3,16 +3,20 @@ from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    def validate_email(self, attrs):
-        if attrs == '':
-            raise serializers.ValidationError('This field may not be blank.')
-        return attrs
+    is_subscribed = serializers.SerializerMethodField
 
-    def perform_create(self, serializer):
-        instance = serializer.save()
-        instance.set_password(instance.password)
-        instance.save()
+    def get_is_subscribed(self, obj):
+        pass
+
+
+    def create(self, validated_data):
+        # Use helper function to create user with hashed password
+        return User.objects.create_user(**validated_data)
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'first_name', 'last_name', 'password']
+        fields = ['email', 'id', 'username', 'first_name', 'last_name', 'password']
+        # Ensure there are no empty fields and that the password is hidden
+        extra_kwargs = dict.fromkeys(['email', 'first_name', 'last_name'], {'allow_blank': False, 'required': True})
+        extra_kwargs['password'] = {'write_only': True}
+    
