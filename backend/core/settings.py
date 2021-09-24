@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-&+o(9lks31wz^=%s-buk^vp1a!x7^cl+3gpy3ror_yeq94)j(9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['backend', '127.0.0.1']
 
 
 # Application definition
@@ -39,8 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_filters',
     'auth_api',
     'users_api',
+    'foodgram_api',
 ]
 
 MIDDLEWARE = [
@@ -133,3 +135,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication'
     ]
 }
+
+AUTHENTICATION_BACKENDS = [
+    'auth_api.backends.CustomModelBackend',
+    'django.contrib.auth.backends.ModelBackend'
+]

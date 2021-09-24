@@ -1,5 +1,0 @@
-from rest_framework import pagination
-
-class UserPagination(pagination.PageNumberPagination):
-    page_size = 10
-    page_size_query_param = 'limit'
