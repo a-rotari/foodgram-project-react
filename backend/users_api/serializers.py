@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from foodgram_api.models import Favorite, ShoppingCart
 from .models import User, UserSubscription
 
 
@@ -19,7 +20,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         # Use helper function to create user with hashed password
-        return User.objects.create_user(**validated_data)
+        user = User.objects.create_user(**validated_data)
+        Favorite.objects.create(user=user)
+        ShoppingCart.objects.create(user=user)
+        return user 
 
     class Meta:
         model = User
