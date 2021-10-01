@@ -17,11 +17,13 @@ class IngredientSerializer(serializers.ModelSerializer):
         #fields = ['name', 'measurement_unit']
         fields = '__all__'
 
+
 class PortionSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
-    measurement_unit = serializers.ReadOnlyField(source='ingredient.measurement_unit')
-    
+    measurement_unit = serializers.ReadOnlyField(
+        source='ingredient.measurement_unit')
+
     class Meta:
         model = Portion
         fields = ('id', 'name', 'measurement_unit', 'amount')
@@ -30,8 +32,10 @@ class PortionSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
-    ingredients = PortionSerializer(source='portion_set', many=True, read_only=True)
+    ingredients = PortionSerializer(
+        source='portion_set', many=True, read_only=True)
     is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
 
     def get_is_favorited(self, obj):
         current_user = self.context.get('request').user
@@ -42,11 +46,19 @@ class RecipeSerializer(serializers.ModelSerializer):
             return True
         return False
 
+    def get_is_in_shopping_cart(self, obj):
+        current_user = self.context.get('request').user
+        if current_user.is_anonymous:
+            return False
+        if obj in current_user.shoppingcart.recipes.all():
+            return True
+        return False
 
     class Meta:
         model = Recipe
         fields = ('id', 'tags', 'author', 'ingredients',
-                  'is_favorited', 'name', 'image', 'text', 'cooking_time')
+                  'is_favorited', 'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time')
+
 
 class ShortRecipeSerializer(serializers.ModelSerializer):
 

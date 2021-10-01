@@ -1,6 +1,7 @@
 from rest_framework import viewsets, views, permissions, status, renderers
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
+from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.exceptions import APIException
 from core import paginate
@@ -32,12 +33,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.RecipeSerializer
     pagination_class = paginate.CustomPagination
 
+
 class AddRemoveFavorite(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, pk):
         favorite = request.user.favorite
-        recipe = get_object_or_404(Recipe.objects.all(), pk=pk) 
+        recipe = get_object_or_404(Recipe.objects.all(), pk=pk)
         if recipe in favorite.recipes.all():
             return Response({'errors': 'Recipe already in favorites.'}, status=status.HTTP_400_BAD_REQUEST)
         favorite.recipes.add(recipe)
@@ -46,11 +48,12 @@ class AddRemoveFavorite(views.APIView):
 
     def delete(self, request, pk):
         favorite = request.user.favorite
-        recipe = get_object_or_404(Recipe.objects.all(), pk=pk) 
-        if not recipe  in favorite.recipes.all(): 
+        recipe = get_object_or_404(Recipe.objects.all(), pk=pk)
+        if not recipe in favorite.recipes.all():
             return Response({'errors': 'Recipe not in favorites.'}, status=status.HTTP_400_BAD_REQUEST)
         favorite.recipes.remove(recipe)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class AddRemoveShoppingCart(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -72,5 +75,31 @@ class AddRemoveShoppingCart(views.APIView):
         cart_recipes.remove(recipe)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 class DownloadShoppingCart(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        shopping_cart = request.user.shoppingcart
+        ingredients = {}
+        text = ''
+        for recipe in shopping_cart.recipes.all():
+            recipe_ingredients = recipe.ingredients.all()
+            for ingredient in recipe_ingredients:
+                if ingredient.name not in ingredients:
+                    ingredients[ingredient.name] = [
+                        ingredient.portion_set.get(recipe=recipe).amount,
+                        ingredient.measurement_unit]
+                else:
+                    ingredients[ingredient.name][0] += ingredient.portion_set.get(
+                        recipe=recipe).amount
+        for name in ingredients.keys():
+            amount = str(ingredients[name][0])
+            unit = ingredients[name][1]
+            text += '* ' + name + ': ' + amount + ' ' + unit + '\r\n'
+        file_name = request.user.username + '.txt'
+        content = text
+        response = HttpResponse(content, content_type='plain/text')
+        response['Content-Disposition'] = 'attachment; filename="{0}"'.format(
+            file_name)
+        return response
