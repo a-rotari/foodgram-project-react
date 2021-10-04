@@ -1,6 +1,21 @@
+import base64
+from unittest.mock import Base
+import uuid
+from django.core.files.base import ContentFile
 from rest_framework import serializers
 from .models import Portion, Tag, Ingredient, Recipe, Favorite
 from users_api.serializers import UserSerializer
+
+
+class Base64ImageField(serializers.FileField):
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith('data:image'):
+            format, imgstr = data.split(';base64,')
+            ext = format.split('/')[-1]
+            id = uuid.uuid4()
+            data = ContentFile(base64.b64decode(imgstr),
+                               name=id.urn[9:] + '.' + ext)
+        return super(Base64ImageField, self).to_internal_value(data)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -36,6 +51,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         source='portion_set', many=True, read_only=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
+    image = Base64ImageField()
 
     def get_is_favorited(self, obj):
         current_user = self.context.get('request').user
