@@ -2,6 +2,11 @@ from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
 class RecipePermission(BasePermission):
+    """
+    This custom permission class is intended to be used for handling Recipe
+    objects.
+    """
+
     def has_permission(self, request, view):
         return (request.method in SAFE_METHODS
                 or request.user.is_authenticated
