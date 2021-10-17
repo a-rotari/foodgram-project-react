@@ -9,8 +9,10 @@ from .models import User, UserSubscription
 
 
 class UserListCreate(generics.ListCreateAPIView):
+    """ This APIView provides a list of Users and allows creation
+        of new Users. """
+
     queryset = User.objects.all()
-    # serializer_class = serializers.UserSerializer
     pagination_class = paginate.CustomPagination
 
     def get_serializer_class(self):
@@ -19,19 +21,18 @@ class UserListCreate(generics.ListCreateAPIView):
         return serializers.UserSerializerFull
 
     def get_permissions(self):
-        """
-        Instantiates and returns the list of permissions that this view requires.
-        """
-        # print(self.request.method)
+        """ Sets permission for the view based on the request method. """
         if self.request.method == 'GET':
             self.permission_classes = [permissions.IsAuthenticated]
         else:
             self.permission_classes = [permissions.AllowAny]
-        # print(self.permission_classes)
         return [permission() for permission in self.permission_classes]
 
 
 class CurrentUserView(views.APIView):
+    """ This simple view enables the endpoint that shows
+        the current user data. """
+
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
@@ -41,21 +42,21 @@ class CurrentUserView(views.APIView):
 
 
 class SubscriptionsView(generics.ListAPIView):
+    """ This APIView provides the list of followed Users. """
+
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = paginate.CustomPagination
     serializer_class = serializers.UserRecipeSerializer
 
     def get_queryset(self):
-        return User.objects.filter(subscribers__subscriber=self.request.user.id)
-
-    # def get(self, request):
-    #     serializer = serializers.SubscriptionSerializer(
-    #         request.user.followed_users.all(), many=True
-    #     )
-    #     return Response(serializer.data)
+        return User.objects.filter(
+            subscribers__subscriber=self.request.user.id)
 
 
 class CreateDestroySubscriptionView(views.APIView):
+    """ This simple view enables the endpoint that creates or deletes
+        User subscriptions. """
+
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, pk):
@@ -64,7 +65,9 @@ class CreateDestroySubscriptionView(views.APIView):
         subscribed = UserSubscription.objects.filter(subscriber=user,
                                                      following=user_to_follow)
         if (user == user_to_follow) or (subscribed):
-            return Response({'errors': 'Already subscribed.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'errors': 'Already subscribed.'},
+                status=status.HTTP_400_BAD_REQUEST)
         UserSubscription.objects.create(subscriber=user,
                                         following=user_to_follow)
         serializer = serializers.UserRecipeSerializer(
@@ -76,28 +79,39 @@ class CreateDestroySubscriptionView(views.APIView):
     def delete(self, request, pk):
         user_to_unfollow = get_object_or_404(User, pk=pk)
         user = request.user
-        subscribed = UserSubscription.objects.filter(subscriber=user,
-                                                     following=user_to_unfollow)
+        subscribed = UserSubscription.objects.filter(
+            subscriber=user,
+            following=user_to_unfollow)
         if (user == user_to_unfollow) or not (subscribed):
-            return Response({'errors': 'Not following the user -- can\'t unfollow.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'errors': 'Not following the user -- can\'t unfollow.'},
+                status=status.HTTP_400_BAD_REQUEST)
         subscribed.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserProfileView(generics.RetrieveAPIView):
+    """ This APIView shows a User profile detail. """
+
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializerFull
     permission_classes = [permissions.IsAuthenticated]
 
 
 class ChangePasswordView(views.APIView):
+    """ This simple view provides an endpoint that enables changing the
+        password. """
+
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         serializer = serializers.ChangePasswordSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            if not request.user.check_password(serializer.data.get('current_password')):
-                return Response({"current_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+            if not request.user.check_password(
+                    serializer.data.get('current_password')):
+                return Response(
+                    {"current_password": ["Wrong password."]},
+                    status=status.HTTP_400_BAD_REQUEST)
             request.user.set_password(serializer.data.get('new_password'))
             request.user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
