@@ -99,8 +99,7 @@ class UserProfileView(generics.RetrieveAPIView):
 
 
 class ChangePasswordView(views.APIView):
-    """ This simple view provides an endpoint that enables changing the
-        password. """
+    """ This simple view provides an endpoint for changing the password. """
 
     permission_classes = [permissions.IsAuthenticated]
 
