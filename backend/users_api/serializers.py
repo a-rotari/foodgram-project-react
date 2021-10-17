@@ -1,13 +1,15 @@
 from rest_framework import serializers
 
-from foodgram_api.models import Favorite, ShoppingCart, Recipe
+from foodgram_api.models import Favorite, Recipe, ShoppingCart
+
 from .models import User, UserSubscription
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """ Serializer for User model. """
 
     def create(self, validated_data):
-        # Using helper function 'create_user' to create user with hashed password
+        # Using the 'create_user' function to create user with hashed password
         user = User.objects.create_user(**validated_data)
         Favorite.objects.create(user=user)
         ShoppingCart.objects.create(user=user)
@@ -24,6 +26,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserSerializerFull(UserSerializer):
+    """ Serializer for User model that adds a method-field displaying user
+        subscription status.  """
     is_subscribed = serializers.SerializerMethodField()
 
     def get_is_subscribed(self, obj):
@@ -43,12 +47,14 @@ class UserSerializerFull(UserSerializer):
 
 
 class ChangePasswordSerializer(serializers.Serializer):
-    #model = User
+    """ Serializer that handles the change of password. """
     new_password = serializers.CharField(required=True, max_length=150)
     current_password = serializers.CharField(required=True, max_length=150)
 
 
 class ShortRecipeSerializer(serializers.ModelSerializer):
+    """ Short serializer for Recipes that has only 4 fields:
+        id, name, image, cooking_time. """
 
     class Meta:
         model = Recipe
@@ -56,8 +62,11 @@ class ShortRecipeSerializer(serializers.ModelSerializer):
 
 
 class UserRecipeSerializer(UserSerializerFull):
+    """ Serializer for User model that adds a read-only recipes field and a
+        query parameter 'recipes_limit' to limit the number of recipes shown.
+        Also shows the total number of recipes for each displayed User. """
+
     recipes = serializers.SerializerMethodField()
-    #recipes = ShortRecipeSerializer(source='recipe_set', many=True)
     recipes_count = serializers.SerializerMethodField()
 
     def get_recipes(self, user):
@@ -78,11 +87,3 @@ class UserRecipeSerializer(UserSerializerFull):
 
     class Meta(UserSerializerFull.Meta):
         fields = UserSerializerFull.Meta.fields + ['recipes', 'recipes_count']
-
-
-class SubscriptionSerializer(serializers.ModelSerializer):
-    following = UserRecipeSerializer()
-
-    class Meta:
-        model = UserSubscription
-        fields = ['following']
