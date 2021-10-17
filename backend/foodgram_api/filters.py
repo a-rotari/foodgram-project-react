@@ -5,6 +5,12 @@ from .models import Recipe, Tag
 
 
 class RecipeFilter(filters.FilterSet):
+    """
+    Custom filterset for the view handling Recipe operations.
+    Filtering criteria: Recipe author, whether the Recipe is in Favorite,
+    whether Recipe is in ShoppingCart, Recipe tags.
+    """
+
     author = filters.NumberFilter(field_name='author__id')
     is_favorited = filters.NumberFilter(method='filter_favorited')
     is_in_shopping_cart = filters.NumberFilter(method='filter_shopping_cart')
@@ -16,19 +22,16 @@ class RecipeFilter(filters.FilterSet):
         for name, value in self.form.cleaned_data.items():
             filtered_queryset = self.filters[name].filter(queryset, value)
             queryset = queryset.intersection(filtered_queryset)
-            assert isinstance(queryset, models.QuerySet), \
-                "Expected '%s.%s' to return a QuerySet, but got a %s instead." \
-                % (type(self).__name__, name, type(queryset).__name__)
         return queryset
 
     def filter_favorited(self, queryset, name, value):
         if value == 1 and self.request.user.is_authenticated:
-            queryset = self.request.user.favorite.recipes.all()
+            return self.request.user.favorite.recipes.all()
         return queryset
 
     def filter_shopping_cart(self, queryset, name, value):
         if value == 1 and self.request.user.is_authenticated:
-            queryset = self.request.user.shoppingcart.recipes.all()
+            return self.request.user.shoppingcart.recipes.all()
         return queryset
 
     def filter_tags(self, queryset, name, value):
@@ -37,7 +40,7 @@ class RecipeFilter(filters.FilterSet):
             tag_id = []
             for tag_slug in tag_slugs:
                 tag_id.append(Tag.objects.get(slug=tag_slug).id)
-            queryset = Recipe.objects.filter(tags__in=tag_id)
+            return Recipe.objects.filter(tags__in=tag_id)
         return queryset
 
     class Meta:
