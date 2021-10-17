@@ -1,4 +1,3 @@
-from .models import Favorite, Ingredient, Portion, Recipe, Tag
 import base64
 import json
 import uuid
@@ -9,8 +8,12 @@ from rest_framework import serializers
 
 from users_api.serializers import UserSerializerFull
 
+from .models import Favorite, Ingredient, Portion, Recipe, Tag
+
 
 class Base64ImageField(serializers.FileField):
+    """ This is a custom field that handles Base64 image data. """
+
     def to_internal_value(self, data):
         if isinstance(data, str) and data.startswith('data:image'):
             format, imgstr = data.split(';base64,')
@@ -22,6 +25,7 @@ class Base64ImageField(serializers.FileField):
 
 
 class TagSerializer(serializers.ModelSerializer):
+    """ This simple serializer is for handling Tag objects. """
 
     class Meta:
         model = Tag
@@ -29,14 +33,19 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
+    """ This simple serializer is for handling Ingredient objects. """
 
     class Meta:
         model = Ingredient
-        # fields = ['name', 'measurement_unit']
         fields = '__all__'
 
 
 class PortionSerializer(serializers.ModelSerializer):
+    """
+    This serializer is for handling Portion objects from
+    the intermediate table between Recipe and Ingredient.
+    """
+
     id = serializers.ReadOnlyField(source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
@@ -48,6 +57,8 @@ class PortionSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
+    """ This serializer is for handling the Recipe objects. """
+
     tags = TagSerializer(many=True, read_only=True)
     author = UserSerializerFull(read_only=True)
     ingredients = PortionSerializer(
@@ -74,12 +85,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         return False
 
     def create(self, validated_data):
-        # try:
-        #     ingredients_data = json.loads(validated_data.pop('ingredients'))
-        #     tags_data = json.loads(validated_data.pop('tags'))
-        # except ValueError:
-        #     raise serializers.ValidationError(
-        #         {'ingredients, tags': ['These fields use JSON format.']})
         ingredients_data = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
@@ -122,10 +127,15 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ('id', 'tags', 'author', 'ingredients',
-                  'is_favorited', 'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time')
+                  'is_favorited', 'is_in_shopping_cart',
+                  'name', 'image', 'text', 'cooking_time')
 
 
 class ShortRecipeSerializer(serializers.ModelSerializer):
+    """
+    This serializer provides less complete serialization of
+    Recipe objects for shorter output.
+    """
 
     class Meta:
         model = Recipe
