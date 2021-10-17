@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Tag, Ingredient, Recipe, Portion, Favorite, ShoppingCart
+
+from .models import Favorite, Ingredient, Portion, Recipe, ShoppingCart, Tag
+
 
 class PortionInLine(admin.TabularInline):
     model = Portion

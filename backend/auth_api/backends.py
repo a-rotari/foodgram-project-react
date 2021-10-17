@@ -1,6 +1,7 @@
 from django.contrib.auth.backends import ModelBackend
-from users_api.models import User
 from rest_framework.authtoken.models import Token
+
+from users_api.models import User
 
 
 class CustomModelBackend(ModelBackend):

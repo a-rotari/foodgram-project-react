@@ -1,12 +1,20 @@
-from rest_framework import viewsets, views, permissions, status, renderers
+import json
+
+from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404
-from django.http import FileResponse
-from django.http import HttpResponse
-from rest_framework.response import Response
+from django_filters import rest_framework as filters
+from rest_framework import permissions, renderers, status, views, viewsets
 from rest_framework.exceptions import APIException
+#import rest_framework
+from rest_framework.response import Response
+from rest_framework.serializers import ValidationError
+
 from core import paginate
-from .models import Ingredient, Tag, Recipe, Favorite
+
 from . import serializers
+from .filters import RecipeFilter
+from .models import Favorite, Ingredient, Recipe, Tag
+from .permissions import RecipePermission
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -32,6 +40,98 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = serializers.RecipeSerializer
     pagination_class = paginate.CustomPagination
+    permission_classes = [RecipePermission]
+    filter_backends = [filters.DjangoFilterBackend]
+    filterset_class = RecipeFilter
+    ordering = ['id']
+
+    def get_object(self):
+        """
+        Returns the object the view is displaying.
+
+        You may want to override this if you need to provide non-standard
+        queryset lookups.  Eg if objects are referenced using multiple
+        keyword arguments in the url conf.
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Perform the lookup filtering.
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+
+        assert lookup_url_kwarg in self.kwargs, (
+            'Expected view %s to be called with a URL keyword argument '
+            'named "%s". Fix your URL conf, or set the `.lookup_field` '
+            'attribute on the view correctly.' %
+            (self.__class__.__name__, lookup_url_kwarg)
+        )
+
+        obj = get_object_or_404(Recipe, id=self.kwargs[lookup_url_kwarg])
+
+        # May raise a permission denied
+        self.check_object_permissions(self.request, obj)
+
+        return obj
+
+    # def get_queryset(self):
+    #     """ Override queryset to filter by parameter 'name' """
+    #     is_favorited = self.request.query_params.get('is_favorited')
+    #     is_in_shopping_cart = self.request.query_params.get(
+    #         'is_in_shopping_cart')
+    #     tags = self.request.query_params.getlist('tags')
+    #     if is_favorited and (int(is_favorited) == 1):
+    #         favorite = self.request.user.favorite.recipes.all()
+    #     else:
+    #         favorite = self.queryset
+    #     if is_in_shopping_cart and (int(is_in_shopping_cart) == 1):
+    #         shopping = self.request.user.shoppingcart.recipes.all()
+    #     else:
+    #         shopping = self.queryset
+    #     if tags:
+    #         tags_id = []
+    #         for tag in tags:
+    #             tags_id.append(Tag.objects.get(slug=tag).id)
+    #         tags_queryset = Recipe.objects.filter(tags__in=tags_id)
+    #     else:
+    #         tags_queryset = self.queryset
+    #     queryset = self.queryset.intersection(
+    #         favorite, shopping, tags_queryset)
+    #     print(queryset)
+    #     input()
+    #     return queryset
+
+    def perform_create(self, serializer):
+        author = self.request.user
+        if 'ingredients' not in self.request.data:
+            raise ValidationError(
+                {'ingredients': ['This field is required.']})
+        if 'tags' not in self.request.data:
+            raise ValidationError(
+                {'tags': ['This field is required.']})
+        try:
+            ingredients_data = json.loads(self.request.data['ingredients'])
+            tags_data = json.loads(self.request.data['tags'])
+        except ValueError:
+            raise ValidationError(
+                {'ingredients, tags': ['These fields use JSON format.']})
+
+        serializer.save(author=author,
+                        ingredients=ingredients_data,
+                        tags=tags_data)
+
+    def perform_update(self, serializer):
+        # author = self.request.user
+        # if 'ingredients' not in self.request.data:
+        #     raise ValidationError(
+        #         {'ingredients': ['This field is required.']})
+        # if 'tags' not in self.request.data:
+        #     raise ValidationError(
+        #         {'tags': ['This field is required.']})
+        # ingredients = self.request.data['ingredients']
+        # tags = self.request.data['tags']
+        # serializer.save(author=author,
+        #                 ingredients=ingredients,
+        #                 tags=tags)
+        self.perform_create(serializer)
 
 
 class AddRemoveFavorite(views.APIView):

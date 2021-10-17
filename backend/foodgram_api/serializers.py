@@ -1,10 +1,13 @@
+from .models import Favorite, Ingredient, Portion, Recipe, Tag
 import base64
-from unittest.mock import Base
+import json
 import uuid
+from unittest.mock import Base
+
 from django.core.files.base import ContentFile
 from rest_framework import serializers
-from .models import Portion, Tag, Ingredient, Recipe, Favorite
-from users_api.serializers import UserSerializer
+
+from users_api.serializers import UserSerializerFull
 
 
 class Base64ImageField(serializers.FileField):
@@ -29,7 +32,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ingredient
-        #fields = ['name', 'measurement_unit']
+        # fields = ['name', 'measurement_unit']
         fields = '__all__'
 
 
@@ -46,7 +49,7 @@ class PortionSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
-    author = UserSerializer(read_only=True)
+    author = UserSerializerFull(read_only=True)
     ingredients = PortionSerializer(
         source='portion_set', many=True, read_only=True)
     is_favorited = serializers.SerializerMethodField()
@@ -69,6 +72,52 @@ class RecipeSerializer(serializers.ModelSerializer):
         if obj in current_user.shoppingcart.recipes.all():
             return True
         return False
+
+    def create(self, validated_data):
+        # try:
+        #     ingredients_data = json.loads(validated_data.pop('ingredients'))
+        #     tags_data = json.loads(validated_data.pop('tags'))
+        # except ValueError:
+        #     raise serializers.ValidationError(
+        #         {'ingredients, tags': ['These fields use JSON format.']})
+        ingredients_data = validated_data.pop('ingredients')
+        tags_data = validated_data.pop('tags')
+        recipe = Recipe.objects.create(**validated_data)
+        for ingredient in ingredients_data:
+            Portion.objects.create(
+                recipe=recipe,
+                ingredient=Ingredient.objects.get(id=ingredient['id']),
+                amount=ingredient['amount'])
+        for tag_id in tags_data:
+            tag = Tag.objects.get(id=tag_id)
+            recipe.tags.add(tag)
+        return recipe
+
+    def update(self, instance, validated_data):
+        ingredients_data = validated_data.pop('ingredients')
+        tags_data = validated_data.pop('tags')
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+
+        instance.ingredients.clear()
+        for ingredient in ingredients_data:
+            Portion.objects.create(
+                recipe=instance,
+                ingredient=Ingredient.objects.get(id=ingredient['id']),
+                amount=ingredient['amount'])
+
+        instance.tags.clear()
+
+        try:
+            for tag_id in tags_data:
+                tag = Tag.objects.get(id=tag_id)
+                instance.tags.add(tag)
+        except TypeError:
+            instance.tags.add(Tag.objects.get(id=tags_data))
+        return instance
 
     class Meta:
         model = Recipe

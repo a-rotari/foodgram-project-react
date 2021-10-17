@@ -25,7 +25,6 @@ class CustomAuthTokenSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         email = attrs.get('email')
-        print('VALIDATE: EMAIL: ', email)
         password = attrs.get('password')
 
         if email and password:
