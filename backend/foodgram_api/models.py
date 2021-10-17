@@ -5,10 +5,15 @@ from users_api.models import User
 
 
 class Tag(models.Model):
+    """ Model for Tag objects. """
+
     name = models.CharField(max_length=200, null=False,
                             blank=False, unique=True)
-    color = models.CharField(max_length=7, null=False, blank=False, unique=True, validators=[
-                             RegexValidator('#[0-9A-F]{6}$', 'Color code must be in hex format, i.e. \'#FFFFFF\'')])
+    color = models.CharField(
+        max_length=7, null=False, blank=False, unique=True,
+        validators=[RegexValidator(
+            '#[0-9A-F]{6}$',
+            'Color code must be in hex format, i.e. \'#FFFFFF\'')])
     slug = models.SlugField(max_length=200, null=False,
                             blank=False, unique=True)
 
@@ -17,6 +22,8 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
+    """ Model for Ingredient objects. """
+
     name = models.CharField(max_length=200, null=False, blank=False)
     measurement_unit = models.CharField(max_length=200)
 
@@ -25,6 +32,8 @@ class Ingredient(models.Model):
 
 
 class Recipe(models.Model):
+    """ Model for Recipe objects. """
+
     tags = models.ManyToManyField(Tag)
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, null=False, blank=False)
@@ -41,6 +50,11 @@ class Recipe(models.Model):
 
 
 class Portion(models.Model):
+    """
+    Intermediate model enabling additional 'amount' field
+    in the many-to-many relation between Recipe and Ingredient.
+    """
+
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     amount = models.IntegerField()
@@ -50,6 +64,11 @@ class Portion(models.Model):
 
 
 class Favorite(models.Model):
+    """
+    Intermediate model functioning as an additional field on User model and
+    enabling many-to-many relations between User and Recipe.
+    """
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     recipes = models.ManyToManyField(Recipe, blank=True)
 
@@ -58,6 +77,11 @@ class Favorite(models.Model):
 
 
 class ShoppingCart(models.Model):
+    """
+    Intermediate model functioning as an additional field on User model and
+    enabling many-to-many relations between User and Recipe.
+    """
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     recipes = models.ManyToManyField(Recipe, blank=True)
 
