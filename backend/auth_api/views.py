@@ -7,6 +7,9 @@ from . import serializers
 
 
 class CustomAuthToken(ObtainAuthToken):
+    """ This view is for obtaining the authentication
+        token (logging in). """
+
     serializer_class = serializers.CustomAuthTokenSerializer
 
     def post(self, request, *args, **kwargs):
@@ -21,6 +24,9 @@ class CustomAuthToken(ObtainAuthToken):
 
 
 class DeleteAuthToken(views.APIView):
+    """ This view is for deleting the authentication
+        token (logging out). """
+
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
