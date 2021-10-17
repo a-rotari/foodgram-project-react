@@ -133,3 +133,6 @@ dmypy.json
 
 # local media files
 backend/media/*
+
+# flake8
+setup.cfg
