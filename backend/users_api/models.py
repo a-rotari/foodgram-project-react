@@ -5,6 +5,7 @@ User = get_user_model()
 
 
 class UserSubscription(models.Model):
+    """ Intermediate model enabling Users to subscribe to one another. """
     subscriber = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
