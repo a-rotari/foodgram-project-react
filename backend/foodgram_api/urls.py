@@ -14,6 +14,7 @@ urlpatterns = [
     path('recipes/<int:pk>/favorite/',
          views.AddRemoveFavorite.as_view(), name='add-remove-favorite'),
     path('recipes/<int:pk>/shopping_cart/',
-         views.AddRemoveShoppingCart.as_view(), name='add-remove-shopping-cart'),
+         views.AddRemoveShoppingCart.as_view(),
+         name='add-remove-shopping-cart'),
     path('', include(router.urls)),
 ]
