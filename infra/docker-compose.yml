@@ -2,6 +2,7 @@ version: "3.3"
 services:
   db:
     image: postgres:12.4
+    restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
@@ -12,13 +13,14 @@ services:
       context: ../frontend
       dockerfile: Dockerfile
     volumes:
-      - ../frontend/:/app/result_build/
+      - frontend_data:/app/result_build/
+    depends_on:
+      - db
 
   backend:
     build:
       context: ../backend
       dockerfile: Dockerfile
-    container_name: infra_backend
     restart: always
     command: >
       bash -c "gunicorn core.wsgi:application --bind 0.0.0.0:8000"
@@ -36,14 +38,17 @@ services:
       - 80:80
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - ../frontend/build:/usr/share/nginx/html/
       - ../docs/redoc.html:/usr/share/nginx/html/api/docs/redoc.html
       - ../docs/openapi-schema.yml:/usr/share/nginx/html/api/docs/openapi-schema.yml
+      - frontend_data:/usr/share/nginx/html/
+      #- frontend_data:/var/html/
       - static_value:/var/html/static/
       - media_value:/var/html/media/
     depends_on:
       - backend
+      - frontend
 volumes:
+  frontend_data:
   postgres_data:
   static_value:
   media_value:
