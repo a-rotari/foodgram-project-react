@@ -41,8 +41,8 @@ services:
       - ../docs/redoc.html:/usr/share/nginx/html/api/docs/redoc.html
       - ../docs/openapi-schema.yml:/usr/share/nginx/html/api/docs/openapi-schema.yml
       - frontend_data:/usr/share/nginx/html/
-      - static_value:/var/html/static/
-      - media_value:/var/html/media/
+      - backend_static:/var/html/backend_static/
+      - backend_media:/var/html/backend_media/
     depends_on:
       - backend
       - frontend
