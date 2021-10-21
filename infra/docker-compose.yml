@@ -25,8 +25,8 @@ services:
     command: >
       bash -c "gunicorn core.wsgi:application --bind 0.0.0.0:8000"
     volumes:
-      - static_value:/code/static/
-      - media_value:/code/media/
+      - backend_static:/code/backend_static/
+      - backend_media:/code/backend_media/
     depends_on:
       - db
     env_file:
@@ -49,5 +49,5 @@ services:
 volumes:
   frontend_data:
   postgres_data:
-  static_value:
-  media_value:
+  backend_static:
+  backend_media:
