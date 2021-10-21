@@ -135,4 +135,4 @@ dmypy.json
 backend/media/*
 
 # flake8
-setup.cfg
+#setup.cfg
