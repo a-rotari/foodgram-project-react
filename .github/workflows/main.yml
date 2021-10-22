@@ -85,6 +85,12 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd infra
+            rm .env
+            echo ${{ secrets.DB_NAME }} > .env
+            echo ${{ secrets.POSTGRES_USER }} > .env
+            echo ${{ secrets.POSTGRES_PASSWORD }} > .env
+            echo ${{ secrets.DB_HOST }} > .env
+            echo ${{ secrets.DB_PORT }} > .env
             docker-compose up
           # script: |
           #   sudo docker pull ${{ secrets.DOCKER_USERNAME }}/infra_actions:latest
