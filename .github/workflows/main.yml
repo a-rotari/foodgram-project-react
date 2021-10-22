@@ -75,7 +75,7 @@ jobs:
           port: 22
           key: ${{ secrets.SSH_KEY }}
           source: "infra/docker-compose.yml"
-          target: "."
+          target: "testf"
       - name: executing remote ssh commands to deploy
         uses: appleboy/ssh-action@master
         with:
