@@ -25,7 +25,10 @@ services:
     #   dockerfile: Dockerfile
     restart: always
     command: >
-      bash -c "gunicorn core.wsgi:application --bind 0.0.0.0:8000"
+      bash -c "python manage.py migrate &&
+              python manage.py collectstatic --noinput &&
+              python manage.py shell > load_ingredients.py &&      
+              gunicorn core.wsgi:application --bind 0.0.0.0:8000"
     volumes:
       - backend_static:/code/backend_static/
       - backend_media:/code/backend_media/
