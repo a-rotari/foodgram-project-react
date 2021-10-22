@@ -84,7 +84,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             raise ValidationError(
                 {'tags': ['This field is required.']})
         try:
-            ingredients_data = json.loads(str(self.request.data['ingredients']))
+            ingredients_data = json.loads(self.request.data['ingredients'])
             tags_data = json.loads(self.request.data['tags'])
         except ValueError:
             raise ValidationError(
