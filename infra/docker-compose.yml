@@ -9,18 +9,20 @@ services:
       - ./.env
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: winterspike/frontend:latest
+    # build:
+    #   context: ../frontend
+    #   dockerfile: Dockerfile
     volumes:
       - frontend_data:/app/result_build/
     depends_on:
       - db
 
   backend:
-    build:
-      context: ../backend
-      dockerfile: Dockerfile
+    image: winterspike/backend:latest
+    # build:
+    #   context: ../backend
+    #   dockerfile: Dockerfile
     restart: always
     command: >
       bash -c "gunicorn core.wsgi:application --bind 0.0.0.0:8000"
