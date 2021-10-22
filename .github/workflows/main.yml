@@ -84,7 +84,8 @@ jobs:
           username: ${{ secrets.USER_NAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            sudo docker-compose up
+            cd infra
+            docker-compose up
           # script: |
           #   sudo docker pull ${{ secrets.DOCKER_USERNAME }}/infra_actions:latest
           #   sudo docker stop $(sudo docker ps -a -q)
