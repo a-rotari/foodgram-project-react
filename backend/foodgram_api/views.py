@@ -83,13 +83,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if 'tags' not in self.request.data:
             raise ValidationError(
                 {'tags': ['This field is required.']})
-        try:
-            ingredients_data = json.loads(self.request.data['ingredients'])
-            tags_data = json.loads(self.request.data['tags'])
-        except ValueError:
-            raise ValidationError(
-                {'ingredients, tags': ['These fields use JSON format.']})
-
+        # print('!!!!!!!!!!!!-!!!!!!!!!!!!!!!!!!!!------!!!!!!!!!!')
+        # ing = self.request.data['ingredients']
+        # print(ing)
+        # print(type(ing))
+        # try:
+        #     ingredients_data = json.loads(self.request.data['ingredients'])
+        #     tags_data = json.loads(self.request.data['tags'])
+        # except ValueError:
+        #     raise ValidationError(
+        #         {'ingredients, tags': ['These fields use JSON format.']})
+        ingredients_data = self.request.data['ingredients']
+        tags_data = self.request.data['tags']
         serializer.save(author=author,
                         ingredients=ingredients_data,
                         tags=tags_data)
