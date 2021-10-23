@@ -17,5 +17,10 @@ class UserSubscription(models.Model):
         related_name='subscribers',
     )
 
+    class Meta:
+        verbose_name = 'User Subscription'
+        verbose_name_plural = 'User Subscriptions'
+        ordering = ['subscriber']
+
     def __str__(self):
         return self.subscriber.username + ' >>> ' + self.following.username
