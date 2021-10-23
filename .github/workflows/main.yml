@@ -90,6 +90,7 @@ jobs:
             echo ${{ secrets.POSTGRES_PASSWORD }} >> .env
             echo ${{ secrets.DB_HOST }} >> .env
             echo ${{ secrets.DB_PORT }} >> .env
+            docker-compose pull
             docker-compose up -d --force-recreate
           # script: |
           #   sudo docker pull ${{ secrets.DOCKER_USERNAME }}/infra_actions:latest
