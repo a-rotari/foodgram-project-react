@@ -16,6 +16,11 @@ class Tag(models.Model):
     slug = models.SlugField(max_length=200, null=False,
                             blank=False, unique=True)
 
+    class Meta:
+        verbose_name = 'Tag'
+        verbose_name_plural = 'Tags'
+        ordering = ['name']
+
     def __str__(self):
         return self.name
 
@@ -24,6 +29,11 @@ class Ingredient(models.Model):
     """ Model for Ingredient objects. """
     name = models.CharField(max_length=200, null=False, blank=False)
     measurement_unit = models.CharField(max_length=200)
+
+    class Meta:
+        verbose_name = 'Ingredient'
+        verbose_name_plural = 'Ingredients'
+        ordering = ['name']
 
     def __str__(self):
         return self.name + ' (' + self.measurement_unit + ')'
@@ -42,6 +52,11 @@ class Recipe(models.Model):
     cooking_time = models.IntegerField(
         null=False, blank=False, validators=[MinValueValidator(1), ])
 
+    class Meta:
+        verbose_name = 'Recipe'
+        verbose_name_plural = 'Recipes'
+        ordering = ['name']
+
     def __str__(self):
         return self.name
 
@@ -55,6 +70,11 @@ class Portion(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     amount = models.IntegerField()
 
+    class Meta:
+        verbose_name = 'Amount of an Ingredient in a Recipe'
+        verbose_name_plural = 'Amounts of Ingredients in Recipes'
+        ordering = ['recipe']
+
     def __str__(self):
         return self.recipe.name + ' <<< ' + self.ingredient.name
 
@@ -67,6 +87,11 @@ class Favorite(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     recipes = models.ManyToManyField(Recipe, blank=True)
 
+    class Meta:
+        verbose_name = 'Indicator of a User\'s favorite Recipe'
+        verbose_name_plural = 'Indicators of Users\' favorite Recipes'
+        ordering = ['user']
+
     def __str__(self):
         return self.user.username + ' >>> ' + str(self.recipes.all())
 
@@ -78,6 +103,11 @@ class ShoppingCart(models.Model):
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     recipes = models.ManyToManyField(Recipe, blank=True)
+
+    class Meta:
+        verbose_name = 'Indicator of a Recipe in a Shopping Cart'
+        verbose_name_plural = 'Indicators of Recipes in Shopping Carts'
+        ordering = ['user']
 
     def __str__(self):
         return self.user.username + ' >>> ' + str(self.recipes.all())
