@@ -12,8 +12,10 @@ class RecipeFilter(filters.FilterSet):
     """
 
     author = filters.NumberFilter(field_name='author__id')
-    is_favorited = filters.NumberFilter(method='filter_favorited')
-    is_in_shopping_cart = filters.NumberFilter(method='filter_shopping_cart')
+    #is_favorited = filters.NumberFilter(method='filter_favorited')
+    #is_in_shopping_cart = filters.NumberFilter(method='filter_shopping_cart')
+    is_favorited = filters.BooleanFilter(method='filter_favorited')
+    is_in_shopping_cart = filters.BooleanFilter(method='filter_shopping_cart')
     tags = filters.CharFilter(method='filter_tags')
 
     def filter_queryset(self, queryset):
@@ -25,12 +27,14 @@ class RecipeFilter(filters.FilterSet):
         return queryset
 
     def filter_favorited(self, queryset, name, value):
-        if value == 1 and self.request.user.is_authenticated:
+        # if value == 1 and self.request.user.is_authenticated:
+        if (value is True) and self.request.user.is_authenticated:
             return self.request.user.favorite.recipes.all()
         return queryset
 
     def filter_shopping_cart(self, queryset, name, value):
-        if value == 1 and self.request.user.is_authenticated:
+        # if value == 1 and self.request.user.is_authenticated:
+        if (value is True) and self.request.user.is_authenticated:
             return self.request.user.shoppingcart.recipes.all()
         return queryset
 
