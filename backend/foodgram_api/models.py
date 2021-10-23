@@ -6,15 +6,12 @@ from users_api.models import User
 
 class Tag(models.Model):
     """ Model for Tag objects. """
-    name = models.CharField(max_length=200, null=False,
-                            blank=False, unique=True)
+    name = models.CharField(max_length=200, unique=True)
     color = models.CharField(
-        max_length=7, null=False, blank=False, unique=True,
-        validators=[RegexValidator(
+        max_length=7, unique=True, validators=[RegexValidator(
             '#[0-9A-F]{6}$',
             'Color code must be in hex format, i.e. \'#FFFFFF\'')])
-    slug = models.SlugField(max_length=200, null=False,
-                            blank=False, unique=True)
+    slug = models.SlugField(max_length=200, unique=True)
 
     class Meta:
         verbose_name = 'Tag'
@@ -27,7 +24,7 @@ class Tag(models.Model):
 
 class Ingredient(models.Model):
     """ Model for Ingredient objects. """
-    name = models.CharField(max_length=200, null=False, blank=False)
+    name = models.CharField(max_length=200)
     measurement_unit = models.CharField(max_length=200)
 
     class Meta:
@@ -43,14 +40,13 @@ class Recipe(models.Model):
     """ Model for Recipe objects. """
     tags = models.ManyToManyField(Tag)
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, null=False, blank=False)
+        User, on_delete=models.CASCADE)
     ingredients = models.ManyToManyField(
-        Ingredient, through='Portion', blank=False)
-    name = models.CharField(max_length=200, null=False, blank=False)
-    image = models.FileField(null=False, blank=False)
-    text = models.TextField(null=False, blank=False)
-    cooking_time = models.IntegerField(
-        null=False, blank=False, validators=[MinValueValidator(1), ])
+        Ingredient, through='Portion')
+    name = models.CharField(max_length=200)
+    image = models.FileField()
+    text = models.TextField()
+    cooking_time = models.IntegerField(validators=[MinValueValidator(1), ])
 
     class Meta:
         verbose_name = 'Recipe'
