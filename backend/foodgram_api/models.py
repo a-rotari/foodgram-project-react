@@ -71,8 +71,8 @@ class Portion(models.Model):
     amount = models.IntegerField()
 
     class Meta:
-        verbose_name = 'Amount of an Ingredient in a Recipe'
-        verbose_name_plural = 'Amounts of Ingredients in Recipes'
+        verbose_name = 'Ingredient in a Recipe'
+        verbose_name_plural = 'Ingredients in Recipes'
         ordering = ['recipe']
 
     def __str__(self):
@@ -88,8 +88,8 @@ class Favorite(models.Model):
     recipes = models.ManyToManyField(Recipe, blank=True)
 
     class Meta:
-        verbose_name = 'Indicator of a User\'s favorite Recipe'
-        verbose_name_plural = 'Indicators of Users\' favorite Recipes'
+        verbose_name = 'User\'s favorite Recipe'
+        verbose_name_plural = 'Users\' favorite Recipes'
         ordering = ['user']
 
     def __str__(self):
@@ -105,8 +105,8 @@ class ShoppingCart(models.Model):
     recipes = models.ManyToManyField(Recipe, blank=True)
 
     class Meta:
-        verbose_name = 'Indicator of a Recipe in a Shopping Cart'
-        verbose_name_plural = 'Indicators of Recipes in Shopping Carts'
+        verbose_name = 'Recipe in Shopping Cart'
+        verbose_name_plural = 'Recipes in Shopping Carts'
         ordering = ['user']
 
     def __str__(self):
