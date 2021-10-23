@@ -7,7 +7,6 @@ from users_api.models import User
 class CustomModelBackend(ModelBackend):
     """ Custom authentication backend model that authenticates using
         email/password instead of username/password. """
-
     def authenticate(self, request, email=None, password=None, **kwargs):
         if email is None:
             email = kwargs.get(User.email)

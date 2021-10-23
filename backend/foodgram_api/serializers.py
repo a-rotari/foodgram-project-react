@@ -13,7 +13,6 @@ from .models import Favorite, Ingredient, Portion, Recipe, Tag
 
 class Base64ImageField(serializers.FileField):
     """ This is a custom field that handles Base64 image data. """
-
     def to_internal_value(self, data):
         if isinstance(data, str) and data.startswith('data:image'):
             format, imgstr = data.split(';base64,')
@@ -26,7 +25,6 @@ class Base64ImageField(serializers.FileField):
 
 class TagSerializer(serializers.ModelSerializer):
     """ This simple serializer is for handling Tag objects. """
-
     class Meta:
         model = Tag
         fields = '__all__'
@@ -34,7 +32,6 @@ class TagSerializer(serializers.ModelSerializer):
 
 class IngredientSerializer(serializers.ModelSerializer):
     """ This simple serializer is for handling Ingredient objects. """
-
     class Meta:
         model = Ingredient
         fields = '__all__'
@@ -45,7 +42,6 @@ class PortionSerializer(serializers.ModelSerializer):
     This serializer is for handling Portion objects from
     the intermediate table between Recipe and Ingredient.
     """
-
     id = serializers.ReadOnlyField(source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
@@ -58,7 +54,6 @@ class PortionSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     """ This serializer is for handling the Recipe objects. """
-
     tags = TagSerializer(many=True, read_only=True)
     author = UserSerializerFull(read_only=True)
     ingredients = PortionSerializer(
@@ -136,7 +131,6 @@ class ShortRecipeSerializer(serializers.ModelSerializer):
     This serializer provides less complete serialization of
     Recipe objects for shorter output.
     """
-
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')

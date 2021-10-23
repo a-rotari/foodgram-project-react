@@ -10,7 +10,6 @@ class RecipeFilter(filters.FilterSet):
     Filtering criteria: Recipe author, whether the Recipe is in Favorite,
     whether Recipe is in ShoppingCart, Recipe tags.
     """
-
     author = filters.NumberFilter(field_name='author__id')
     is_favorited = filters.BooleanFilter(method='filter_favorited')
     is_in_shopping_cart = filters.BooleanFilter(method='filter_shopping_cart')

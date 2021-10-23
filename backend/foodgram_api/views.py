@@ -18,7 +18,6 @@ from .permissions import RecipePermission
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     """ This viewset is for displaying Tags. """
-
     queryset = Tag.objects.all()
     serializer_class = serializers.TagSerializer
 
@@ -26,7 +25,6 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     """ This viewset is for displaying Ingredients. It also provides
         search by name of the ingredient. """
-
     queryset = Ingredient.objects.all()
     serializer_class = serializers.IngredientSerializer
 
@@ -41,7 +39,6 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     """ This viewset enables CRUD operations on Recipe objects. """
-
     queryset = Recipe.objects.all()
     serializer_class = serializers.RecipeSerializer
     pagination_class = paginate.CustomPagination
@@ -56,7 +53,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         resulting intersection of several querysets during filtering, as it's
         not supported by Django.
         """
-
         # Perform the lookup filtering.
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
 
@@ -83,16 +79,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if 'tags' not in self.request.data:
             raise ValidationError(
                 {'tags': ['This field is required.']})
-        # print('!!!!!!!!!!!!-!!!!!!!!!!!!!!!!!!!!------!!!!!!!!!!')
-        # ing = self.request.data['ingredients']
-        # print(ing)
-        # print(type(ing))
-        # try:
-        #     ingredients_data = json.loads(self.request.data['ingredients'])
-        #     tags_data = json.loads(self.request.data['tags'])
-        # except ValueError:
-        #     raise ValidationError(
-        #         {'ingredients, tags': ['These fields use JSON format.']})
         ingredients_data = self.request.data['ingredients']
         tags_data = self.request.data['tags']
         serializer.save(author=author,
@@ -138,7 +124,6 @@ class AddRemoveShoppingCart(views.APIView):
     This simple view adds or removes the Recipe to shopping list
     (which adds/removes a Recipe to/from ShoppingCart's many-to-many field).
     """
-
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, pk):
@@ -168,7 +153,6 @@ class DownloadShoppingCart(views.APIView):
     This simple view provides an endpoint for generating and
     downloading the list of ingredients from ShoppingCart.
     """
-
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):

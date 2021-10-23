@@ -11,7 +11,6 @@ from .models import User, UserSubscription
 class UserListCreate(generics.ListCreateAPIView):
     """ This APIView provides a list of Users and allows creation
         of new Users. """
-
     queryset = User.objects.all()
     pagination_class = paginate.CustomPagination
 
@@ -32,7 +31,6 @@ class UserListCreate(generics.ListCreateAPIView):
 class CurrentUserView(views.APIView):
     """ This simple view enables the endpoint that shows
         the current user data. """
-
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
@@ -43,7 +41,6 @@ class CurrentUserView(views.APIView):
 
 class SubscriptionsView(generics.ListAPIView):
     """ This APIView provides the list of followed Users. """
-
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = paginate.CustomPagination
     serializer_class = serializers.UserRecipeSerializer
@@ -56,7 +53,6 @@ class SubscriptionsView(generics.ListAPIView):
 class CreateDestroySubscriptionView(views.APIView):
     """ This simple view enables the endpoint that creates or deletes
         User subscriptions. """
-
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, pk):
@@ -92,7 +88,6 @@ class CreateDestroySubscriptionView(views.APIView):
 
 class UserProfileView(generics.RetrieveAPIView):
     """ This APIView shows a User profile detail. """
-
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializerFull
     permission_classes = [permissions.IsAuthenticated]
@@ -100,7 +95,6 @@ class UserProfileView(generics.RetrieveAPIView):
 
 class ChangePasswordView(views.APIView):
     """ This simple view provides an endpoint for changing the password. """
-
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):

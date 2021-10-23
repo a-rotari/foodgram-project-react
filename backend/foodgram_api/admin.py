@@ -5,7 +5,6 @@ from .models import Favorite, Ingredient, Portion, Recipe, ShoppingCart, Tag
 
 class PortionInLine(admin.TabularInline):
     """ Admin model for displaying portions (ingredients + amounts). """
-
     model = Portion
     extra = 1
 

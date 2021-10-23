@@ -7,7 +7,6 @@ from rest_framework.request import Request
 
 class CustomAuthTokenSerializer(serializers.Serializer):
     """ This serializer is for obtaining the authentication Token. """
-
     password = serializers.CharField(
         label='Password',
         style={'input_type': 'password'},
