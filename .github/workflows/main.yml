@@ -75,7 +75,7 @@ jobs:
           username: ${{ secrets.USER_NAME }}
           port: 22
           key: ${{ secrets.SSH_KEY }}
-          source: "infra/docker-compose.yml,infra/nginx.conf,source/docs"
+          source: "infra/docker-compose.yml,infra/nginx.conf,infra/docs"
           target: "."
       - name: executing remote ssh commands to deploy
         uses: appleboy/ssh-action@master
