@@ -1,8 +1,9 @@
 import json
 
 from django.core.management.base import BaseCommand, CommandError
-from users_api.models import User
+
 from foodgram_api.models import Ingredient, Tag
+from users_api.models import User
 
 
 class Command(BaseCommand):
