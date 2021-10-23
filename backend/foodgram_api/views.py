@@ -191,7 +191,7 @@ class DownloadShoppingCart(views.APIView):
             text += '* ' + name + ': ' + amount + ' ' + unit + '\r\n'
         file_name = request.user.username + '.txt'
         content = text
-        response = HttpResponse(content, content_type='plain/text')
-        response['Content-Disposition'] = 'attachment; filename={0}'.format(
-            file_name)
+        response = HttpResponse(
+            content, content_type='application/text charset=utf-8')
+        response['Content-Disposition'] = f'attachment; filename="{file_name}"'
         return response
