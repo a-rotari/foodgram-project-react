@@ -7,10 +7,13 @@ from users_api.models import User
 class Tag(models.Model):
     """ Model for Tag objects. """
     name = models.CharField(max_length=200, unique=True)
+    # "давай попробуем уберечь пользователя от необходимости вводить хекс-код"
+    # Прости, но непонятно. По ТЗ же hex-код должен быть.
     color = models.CharField(
         max_length=7, unique=True, validators=[RegexValidator(
             '#[0-9A-F]{6}$',
             'Color code must be in hex format, i.e. \'#FFFFFF\'')])
+    # Максимальная длина слага 200 согласно документации (<= 200)
     slug = models.SlugField(max_length=200, unique=True)
 
     class Meta:
@@ -46,7 +49,8 @@ class Recipe(models.Model):
     name = models.CharField(max_length=200)
     image = models.FileField()
     text = models.TextField()
-    cooking_time = models.IntegerField(validators=[MinValueValidator(1), ])
+    cooking_time = models.IntegerField(validators=[MinValueValidator(
+        1, message='Minimum cooking time is 1 minute.'), ])
 
     class Meta:
         verbose_name = 'Recipe'
