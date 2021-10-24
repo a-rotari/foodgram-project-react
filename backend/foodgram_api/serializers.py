@@ -30,20 +30,20 @@ class PortionSerializer(serializers.ModelSerializer):
     the intermediate table between Recipe and Ingredient.
     """
     id = serializers.ReadOnlyField(source='ingredient.id')
+    # recipe = serializers.ReadOnlyField(source='recipe.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit')
 
-    def validate_name(self, value):
-        if self.context['request']._request.method == 'POST':
-            if self.Meta.model.objects.filter(name=value).exists():
-                raise serializers.ValidationError(
-                    'Ингредиенты не должны повторяться')
-        return value
-
     class Meta:
         model = Portion
         fields = ('id', 'name', 'measurement_unit', 'amount')
+        # validators = [
+        #     UniqueTogetherValidator(
+        #         queryset=Portion.objects.all(),
+        #         fields=['id', 'recipe']
+        #     )
+        # ]
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -80,10 +80,16 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags_data = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         for ingredient in ingredients_data:
-            Portion.objects.create(
-                recipe=recipe,
-                ingredient=Ingredient.objects.get(id=ingredient['id']),
-                amount=ingredient['amount'])
+            if Portion.objects.filter(
+                    recipe=recipe,
+                    ingredient__id=ingredient['id']):
+                raise serializers.ValidationError(
+                    {'ingredients': ['Ингредиенты должны быть уникальными']})
+            else:
+                Portion.objects.create(
+                    recipe=recipe,
+                    ingredient=Ingredient.objects.get(id=ingredient['id']),
+                    amount=ingredient['amount'])
         for tag_id in tags_data:
             tag = Tag.objects.get(id=tag_id)
             recipe.tags.add(tag)
