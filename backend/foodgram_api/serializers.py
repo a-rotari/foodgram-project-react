@@ -30,20 +30,15 @@ class PortionSerializer(serializers.ModelSerializer):
     the intermediate table between Recipe and Ingredient.
     """
     id = serializers.ReadOnlyField(source='ingredient.id')
-    # recipe = serializers.ReadOnlyField(source='recipe.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit')
+    amount = serializers.IntegerField(validators=[MinValueValidator(
+        0, message='Количество ингредиентов не может быть отрицательным.'), ])
 
     class Meta:
         model = Portion
         fields = ('id', 'name', 'measurement_unit', 'amount')
-        # validators = [
-        #     UniqueTogetherValidator(
-        #         queryset=Portion.objects.all(),
-        #         fields=['id', 'recipe']
-        #     )
-        # ]
 
 
 class RecipeSerializer(serializers.ModelSerializer):

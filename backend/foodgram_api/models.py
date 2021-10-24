@@ -68,7 +68,8 @@ class Portion(models.Model):
     """
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    amount = models.IntegerField()
+    amount = models.IntegerField(validators=[MinValueValidator(
+        0, message='Количество ингредиентов не может быть отрицательным.'), ])
 
     class Meta:
         verbose_name = 'Ingredient in a Recipe'
