@@ -19,7 +19,7 @@ class Tag(models.Model):
     class Meta:
         verbose_name = 'Tag'
         verbose_name_plural = 'Tags'
-        ordering = ['name']
+        # ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -33,7 +33,7 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = 'Ingredient'
         verbose_name_plural = 'Ingredients'
-        ordering = ['name']
+        # ordering = ['name']
 
     def __str__(self):
         return self.name + ' (' + self.measurement_unit + ')'
@@ -55,7 +55,7 @@ class Recipe(models.Model):
     class Meta:
         verbose_name = 'Recipe'
         verbose_name_plural = 'Recipes'
-        ordering = ['name']
+        # ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -73,7 +73,7 @@ class Portion(models.Model):
     class Meta:
         verbose_name = 'Ingredient in a Recipe'
         verbose_name_plural = 'Ingredients in Recipes'
-        ordering = ['recipe']
+        # ordering = ['recipe']
         unique_together = ['recipe', 'ingredient']
 
     def __str__(self):
@@ -91,7 +91,7 @@ class Favorite(models.Model):
     class Meta:
         verbose_name = 'User\'s favorite Recipe'
         verbose_name_plural = 'Users\' favorite Recipes'
-        ordering = ['user']
+        # ordering = ['user']
 
     def __str__(self):
         return self.user.username + ' >>> ' + str(self.recipes.all())
@@ -108,7 +108,7 @@ class ShoppingCart(models.Model):
     class Meta:
         verbose_name = 'Recipe in Shopping Cart'
         verbose_name_plural = 'Recipes in Shopping Carts'
-        ordering = ['user']
+        # ordering = ['user']
 
     def __str__(self):
         return self.user.username + ' >>> ' + str(self.recipes.all())
