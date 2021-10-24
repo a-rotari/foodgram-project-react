@@ -1,6 +1,7 @@
 import json
 
 from django.core.validators import MinValueValidator
+from rest_framework.validators import UniqueTogetherValidator
 from rest_framework import serializers, validators
 
 from users_api.serializers import UserSerializerFull
@@ -29,16 +30,16 @@ class PortionSerializer(serializers.ModelSerializer):
     the intermediate table between Recipe and Ingredient.
     """
     id = serializers.ReadOnlyField(source='ingredient.id')
-    recipe = serializers.HiddenField(source='recipe.id')
+    recipe = serializers.ReadOnlyField(source='recipe.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit')
 
     class Meta:
         model = Portion
-        fields = ('id', 'name', 'measurement_unit', 'amount')
+        fields = ('id', 'name', 'measurement_unit', 'amount', 'recipe')
         validators = [
-            validators.UniqueTogetherValidator(
+            UniqueTogetherValidator(
                 queryset=Portion.objects.all(),
                 fields=['id', 'recipe']
             )
