@@ -75,6 +75,10 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags_data = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         for ingredient in ingredients_data:
+            if ingredient['amount'] < 0:
+                raise serializers.ValidationError(
+                    {'ingredients': ['Количество ингредиентов не должно '
+                                     'быть отрицательным.']})
             existing_portion = Portion.objects.filter(
                 recipe=recipe,
                 ingredient__id=ingredient['id'])
@@ -96,7 +100,17 @@ class RecipeSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         ingredients_data = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
-
+        for ingredient in ingredients_data:
+            if ingredient['amount'] < 0:
+                raise serializers.ValidationError(
+                    {'ingredients': ['Количество ингредиентов не должно '
+                                     'быть отрицательным.']})
+            existing_portion = Portion.objects.filter(
+                recipe=instance,
+                ingredient__id=ingredient['id'])
+            if existing_portion:
+                raise serializers.ValidationError(
+                    {'ingredients': ['Ингредиенты должны быть уникальными.']})
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 
