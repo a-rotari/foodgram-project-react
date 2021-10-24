@@ -1,7 +1,7 @@
 import json
 
 from django.core.validators import MinValueValidator
-from rest_framework import serializers
+from rest_framework import serializers, validators
 
 from users_api.serializers import UserSerializerFull
 
@@ -29,6 +29,7 @@ class PortionSerializer(serializers.ModelSerializer):
     the intermediate table between Recipe and Ingredient.
     """
     id = serializers.ReadOnlyField(source='ingredient.id')
+    recipe = serializers.HiddenField(source='recipe.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit')
@@ -36,6 +37,12 @@ class PortionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Portion
         fields = ('id', 'name', 'measurement_unit', 'amount')
+        validators = [
+            validators.UniqueTogetherValidator(
+                queryset=Portion.objects.all(),
+                fields=['id', 'recipe']
+            )
+        ]
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -48,7 +55,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     is_in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField()
     cooking_time = serializers.IntegerField(validators=[MinValueValidator(
-        1, message='Minimum cooking time is 1 minute.'), ])
+        1, message='Время приготовления не может быть меньше минуты.'), ])
 
     def get_is_favorited(self, obj):
         current_user = self.context.get('request').user

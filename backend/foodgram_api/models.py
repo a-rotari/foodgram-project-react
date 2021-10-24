@@ -50,7 +50,7 @@ class Recipe(models.Model):
     image = models.FileField()
     text = models.TextField()
     cooking_time = models.IntegerField(validators=[MinValueValidator(
-        1, message='Minimum cooking time is 1 minute.'), ])
+        1, message='Время приготовления не может быть меньше минуты.'), ])
 
     class Meta:
         verbose_name = 'Recipe'
