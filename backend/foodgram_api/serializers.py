@@ -81,8 +81,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.create(**validated_data)
         for ingredient in ingredients_data:
             existing_portion = Portion.objects.filter(
-                    recipe=recipe,
-                    ingredient__id=ingredient['id']):
+                recipe=recipe,
+                ingredient__id=ingredient['id'])
             if existing_portion:
                 existing_portion.delete()
                 recipe.delete()
