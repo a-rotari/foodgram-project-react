@@ -75,7 +75,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags_data = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         for ingredient in ingredients_data:
-            if ingredient['amount'] < 0:
+            if int(ingredient['amount']) < 0:
                 raise serializers.ValidationError(
                     {'ingredients': ['Количество ингредиентов не должно '
                                      'быть отрицательным.']})
@@ -101,7 +101,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients_data = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
         for ingredient in ingredients_data:
-            if ingredient['amount'] < 0:
+            if int(ingredient['amount']) < 0:
                 raise serializers.ValidationError(
                     {'ingredients': ['Количество ингредиентов не должно '
                                      'быть отрицательным.']})
