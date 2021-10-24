@@ -1,6 +1,6 @@
 import json
-from unittest.mock import Base
 
+from django.core.validators import MinValueValidator
 from rest_framework import serializers
 
 from users_api.serializers import UserSerializerFull
@@ -47,6 +47,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField()
+    cooking_time = serializers.IntegerField(validators=[MinValueValidator(
+        1, message='Minimum cooking time is 1 minute.'), ])
 
     def get_is_favorited(self, obj):
         current_user = self.context.get('request').user
