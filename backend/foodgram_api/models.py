@@ -74,6 +74,7 @@ class Portion(models.Model):
         verbose_name = 'Ingredient in a Recipe'
         verbose_name_plural = 'Ingredients in Recipes'
         ordering = ['recipe']
+        unique_together = ['recipe', 'ingredient']
 
     def __str__(self):
         return self.recipe.name + ' <<< ' + self.ingredient.name
