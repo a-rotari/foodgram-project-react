@@ -1,8 +1,8 @@
 import json
 
 from django.core.validators import MinValueValidator
+from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-from rest_framework import serializers, validators
 
 from users_api.serializers import UserSerializerFull
 
