@@ -80,11 +80,14 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags_data = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         for ingredient in ingredients_data:
-            if Portion.objects.filter(
+            existing_portion = Portion.objects.filter(
                     recipe=recipe,
                     ingredient__id=ingredient['id']):
+            if existing_portion:
+                existing_portion.delete()
+                recipe.delete()
                 raise serializers.ValidationError(
-                    {'ingredients': ['Ингредиенты должны быть уникальными']})
+                    {'ingredients': ['Ингредиенты должны быть уникальными.']})
             else:
                 Portion.objects.create(
                     recipe=recipe,
