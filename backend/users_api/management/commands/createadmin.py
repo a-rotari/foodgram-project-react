@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from users_api.models import User
 from foodgram_api.models import Favorite, ShoppingCart
+from users_api.models import User
 
 
 class Command(BaseCommand):
