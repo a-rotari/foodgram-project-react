@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 
 from users_api.models import User
+from foodgram_api.models import Favorite, ShoppingCart
 
 
 class Command(BaseCommand):
@@ -10,5 +11,7 @@ class Command(BaseCommand):
         admin = User.objects.filter(is_staff=True)
 
         if not admin:
-            User.objects.create_superuser(
+            admin = User.objects.create_superuser(
                 'admin', password='admin', email='admin@example.com')
+            Favorite.objects.create(user=admin)
+            ShoppingCart.objects.create(user=admin)
